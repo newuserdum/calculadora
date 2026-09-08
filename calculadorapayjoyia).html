@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financiamiento PayJoy</title>
+<style>
+:root{--green:#8bd957;--dark:#272727;--gray:#d9d9dd;--white:#f5f5f6}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:700;color:#111}
+.app{max-width:1216px;margin:auto;background:var(--gray);min-height:100vh}
+.title,.section-title{background:var(--green);text-align:center;font-weight:900}
+.title{font-size:42px;padding:18px 10px 12px}
+.section-title{font-size:36px;padding:14px 10px 9px}
+.panel{background:var(--gray);padding:23px 6% 21px}
+.label{text-align:center;font-size:21px;text-transform:uppercase;margin-bottom:9px}
+.select{display:block;width:46%;min-width:330px;height:47px;margin:0 auto 26px;background:var(--dark);color:#fff;border:0;text-align:center;font-size:23px;font-weight:800;padding:5px 12px;outline:none}
+select.select{cursor:pointer}
+select.select option{background:#272727;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.fieldbox label{display:block;text-align:center;font-size:21px;text-transform:uppercase;margin-bottom:8px}
+.field,input{font-family:inherit}
+.input{width:100%;height:47px;background:var(--dark);color:#fff;border:0;text-align:center;font-size:23px;font-weight:800;padding:5px 12px;outline:none}
+input[type=number]{appearance:textfield}
+input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.green-zone{background:var(--green);padding:13px 6% 16px}
+.results{background:var(--dark);color:#eee;padding:32px 19%;min-height:270px}
+.result-list{max-width:760px;margin:auto}
+.row{display:grid;grid-template-columns:1.65fr 1fr;gap:24px;align-items:center;font-size:21px;line-height:1.55;text-transform:uppercase;margin-bottom:7px}
+.row strong{font-weight:900}
+.divider{height:2px;background:#777;margin:9px 0 12px}
+.final{background:var(--gray);padding:35px 0 40px}
+.total{background:var(--dark);color:#eee;width:min(400px,70%);margin:auto;text-align:center;padding:11px;font-size:21px}
+.total b{display:block;font-size:25px;margin-top:4px}
+.editable-note{text-align:center;font-size:13px;color:#555;margin-top:8px}
+.error{font-size:13px;color:#b00000;text-align:center;margin-top:7px}
+@media(max-width:700px){
+ .title{font-size:30px}.section-title{font-size:29px}.panel{padding:20px}
+ .select{width:100%;min-width:0;font-size:19px}.grid{grid-template-columns:1fr;gap:15px}
+ .green-zone{padding:14px 20px}.results{padding:27px 24px}
+ .row{grid-template-columns:1fr;gap:2px;font-size:17px;margin-bottom:12px}
+ .row strong{font-size:22px}.label,.fieldbox label{font-size:18px}.total{width:80%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="title">FINANCIAMIENTO PAYJOY</div>
+
+  <!-- Selección rápida de equipo -->
+  <section class="panel">
+    <div class="label">SELECCIONA MARCA</div>
+    <select id="brand" class="select"></select>
+
+    <div class="label">SELECCIONA MODELO</div>
+    <select id="model" class="select"></select>
+
+    <div class="grid">
+      <div class="fieldbox">
+        <label>PRECIO IGV</label>
+        <input id="priceNormal" class="input" type="number" min="0" step="0.01" readonly>
+      </div>
+      <div class="fieldbox">
+        <label>INICIAL</label>
+        <input id="initialNormal" class="input" type="number" min="0" step="0.01" value="260">
+      </div>
+    </div>
+    <div id="noDataMsg" class="error" style="display:none">No hay información de precio disponible para este modelo.</div>
+  </section>
+
+  <section class="green-zone">
+    <div class="grid">
+      <div class="fieldbox">
+        <label>DESCUENTO DE CLIENTE</label>
+        <input id="discountNormal" class="input" type="number" min="0" step="0.01" readonly>
+      </div>
+      <div class="fieldbox">
+        <label>INICIAL A COBRAR</label>
+        <div id="todayNormal" class="input">S/ 0.00</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="results">
+    <div class="result-list">
+      <div class="row"><span>PRECIO IGV</span><strong id="rPriceNormal">S/ 0.00</strong></div>
+      <div class="row"><span>INICIAL</span><strong id="rInitialNormal">S/ 0.00</strong></div>
+      <div class="row"><span>DESCUENTO DE CLIENTE</span><strong id="rDiscountNormal">S/ 0.00</strong></div>
+      <div class="divider"></div>
+      <div class="row"><span>INICIAL A COBRAR</span><strong id="rTodayNormal">S/ 0.00</strong></div>
+      <div class="row">
+        <span>CARGO DE FINANCIAMIENTO</span>
+        <input id="financeNormal" class="input" type="number" min="0" step="0.01" value="130">
+      </div>
+      <div class="row"><span>SALDO A LIQUIDAR (YAPE)</span><strong id="rBalanceNormal">S/ 0.00</strong></div>
+    </div>
+  </section>
+
+  <!-- 2 CUOTAS: SIN BOTÓN EXTRA. Se encuentra directamente al final. -->
+  <div class="section-title">FINANCIAMIENTO EN 2 PAGOS</div>
+
+  <section class="panel">
+    <div class="grid">
+      <div class="fieldbox">
+        <label>PRECIO IGV</label>
+        <input id="priceTwo" class="input" type="number" min="0" step="0.01" readonly>
+      </div>
+      <div class="fieldbox">
+        <label>MONTO A DESCONTAR</label>
+        <input id="discountTwo" class="input" type="number" min="0" step="0.01" readonly>
+      </div>
+    </div>
+  </section>
+
+  <section class="green-zone">
+    <div class="grid">
+      <div class="fieldbox">
+        <label>CARGO DE FINANCIAMIENTO</label>
+        <input id="financeTwo" class="input" type="number" min="0" step="0.01" value="130">
+      </div>
+      <div class="fieldbox">
+        <label>INICIAL A PAGAR HOY</label>
+        <div id="todayTwoPreview" class="input">S/ 0.00</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="results">
+    <div class="result-list">
+      <div class="row"><span>PRECIO IGV</span><strong id="rPriceTwo">S/ 0.00</strong></div>
+      <div class="row"><span>MONTO A DESCONTAR</span><strong id="rDiscountTwo">S/ 0.00</strong></div>
+      <div class="row"><span>CARGO DE FINANCIAMIENTO</span><strong id="rFinanceTwo">S/ 0.00</strong></div>
+      <div class="divider"></div>
+      <div class="row"><span>INICIAL A PAGAR HOY</span><strong id="rTodayTwo">S/ 0.00</strong></div>
+      <div class="row"><span>INICIAL PAYJOY</span><strong id="rSystemTwo">S/ 0.00</strong></div>
+      <div class="row"><span>SALDO A LIQUIDAR (YAPE)</span><strong id="rBalanceTwo">S/ 0.00</strong></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const PRODUCTS={
+ "SAMSUNG":[
+  ["Samsung A07 64GB",890,190,229],
+  ["Samsung A16 4G 128GB",990,150,250],
+  ["Samsung A17 256GB",1290,150,250],
+  ["Samsung A37 5G 256GB",1950,120,220],
+  ["Samsung A57 5G 256GB",2000,30,130]
+ ],
+ "INFINIX":[
+  ["Infinix Hot 60i 4GB (+4GB) 256GB",990,150,250],
+  ["Infinix Hot 60 Pro+ 8GB + 256GB Curvo",1290,130,230],
+  ["Infinix Note 50 Pro 8GB RAM 256GB",1450,120,220]
+ ],
+ "HONOR":[
+  ["Honor X5D 128GB",899,150,229],
+  ["Honor X5C Plus 4GB + 256GB",999,160,260],
+  ["Honor X7D 8GB + 256GB",1300,170,270],
+  ["Honor X8D 8GB + 256GB",1390,120,220],
+  ["Honor Magic 8 Lite 8GB + 256GB",1790,90,190],
+  ["Honor 600E 8GB + 256GB",2000,150,250],
+  ["Honor 600 5G 8GB + 256GB",2300,150,250],
+  ["Honor 600E 5G 8GB + 256GB",null,null,null]
+ ],
+ "XIAOMI / REDMI":[
+  ["Redmi A7 Pro 128GB",890,150,229],
+  ["Redmi Note 15 8GB + 256GB (Curvo)",1250,70,170],
+  ["Redmi Note 15 Pro 4G 256GB",1459,100,200],
+  ["Redmi Note 15 Pro 5G 256GB",1699,110,210],
+  ["Redmi Note 15 Pro Plus 256GB",1950,70,170]
+ ]
+};
+
+const $=id=>document.getElementById(id);
+const num=id=>{let n=parseFloat($(id).value);return Number.isFinite(n)&&n>=0?n:0};
+const money=n=>'S/ '+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const set=(id,n,p='')=>$(id).textContent=p+money(n);
+
+function loadBrands(){
+  $('brand').innerHTML=Object.keys(PRODUCTS).map(b=>`<option value="${b}">${b}</option>`).join('');
+  loadModels();
+}
+function loadModels(){
+  const list=PRODUCTS[$('brand').value];
+  $('model').innerHTML=list.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');
+  loadProduct();
+}
+function loadProduct(){
+  const p=PRODUCTS[$('brand').value][Number($('model').value)||0];
+  if(!p)return;
+  const noData = p[1]==null;
+  $('noDataMsg').style.display = noData ? 'block' : 'none';
+  if(noData){
+    $('priceNormal').value='';
+    $('discountNormal').value='';
+    $('initialNormal').value='';
+    $('priceTwo').value='';
+    $('discountTwo').value='';
+  }else{
+    $('priceNormal').value=p[1];
+    $('discountNormal').value=p[2];
+    // Inicial que debe colocarse en el sistema. El vendedor puede modificarla.
+    $('initialNormal').value=p[3] ?? 0;
+    // La sección de 2 cuotas mantiene su funcionamiento independiente.
+    $('priceTwo').value=p[1];
+    $('discountTwo').value=p[2];
+  }
+  calculate();
+}
+
+function calculateNormal(){
+  const price=num('priceNormal'), initial=num('initialNormal'), discount=num('discountNormal'), finance=num('financeNormal');
+  const today=Math.max(0,initial-discount);
+  // Fórmula normal solicitada: Precio - Inicial + Cargo.
+  const balance=Math.max(0,price-initial+finance);
+  set('todayNormal',today);
+  set('rPriceNormal',price);
+  set('rInitialNormal',initial);
+  set('rDiscountNormal',discount);
+  set('rTodayNormal',today);
+  set('rBalanceNormal',balance);
+}
+
+function calculateTwo(){
+  const price=num('priceTwo'), discount=num('discountTwo'), finance=num('financeTwo');
+  // Fórmula EXACTA solicitada:
+  const initial=(price-discount+finance)/2;
+  const system=initial+discount;
+  const balance=price-system+finance;
+  set('todayTwoPreview',initial);
+  set('rPriceTwo',price);
+  set('rDiscountTwo',discount);
+  set('rFinanceTwo',finance);
+  set('rTodayTwo',initial);
+  set('rSystemTwo',system);
+  set('rBalanceTwo',balance);
+}
+function calculate(){calculateNormal();calculateTwo()}
+
+$('brand').addEventListener('change',loadModels);
+$('model').addEventListener('change',loadProduct);
+
+document.querySelectorAll('input[type=number]').forEach(el=>{
+  el.addEventListener('input',calculate);
+  el.addEventListener('blur',()=>{
+    if(el.value!=='' && Number(el.value)<0)el.value=0;
+    calculate();
+  });
+});
+loadBrands();
+</script>
+</body>
+</html>
